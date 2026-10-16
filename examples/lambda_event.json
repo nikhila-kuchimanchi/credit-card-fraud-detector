@@ -1,0 +1,14 @@
+{
+  "Records": [
+    {
+      "eventID": "example:1",
+      "eventSource": "aws:kinesis",
+      "awsRegion": "us-east-1",
+      "kinesis": {
+        "data": "eyJzY2hlbWFfdmVyc2lvbiI6ICIxLjAiLCAiZmVhdHVyZV92ZXJzaW9uIjogInYxIiwgImV2ZW50X2lkIjogImEzODM2YjMwLTJhMzktNTQzYy1hOGFmLWJhY2E3MTIxZTY3MCIsICJyZXBsYXlfaWQiOiAiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAxIiwgInJlcGxheV9jeWNsZSI6IDAsICJzb3VyY2Vfcm93IjogMCwgInNvdXJjZV9kYXRhc2V0IjogInN5bnRoZXRpY19zYW1wbGUiLCAic291cmNlX3RyYW5zYWN0aW9uX2lkIjogImZpY3Rpb25hbF90eF8wMDAwIiwgInNvdXJjZV90aW1lc3RhbXAiOiAiMjAyMC0wNy0wMSAxMjowMDowMCIsICJlbWl0dGVkX2F0IjogIjIwMjYtMTAtMTZUMTg6MDA6MDArMDA6MDAiLCAiYWNjb3VudF9pZCI6ICJmOWNkOTYwYTgyYzEwODc1NDZhZjBjMjQiLCAiZmVhdHVyZXMiOiB7ImFtb3VudCI6IDguNSwgImNhdGVnb3J5IjogImdyb2NlcnlfcG9zIiwgIm1lcmNoYW50IjogImZpY3Rpb25hbF9tZXJjaGFudF8wIiwgInN0YXRlIjogIk1EIiwgImNpdHlfcG9wdWxhdGlvbiI6IDMwMDAwLCAiY3VzdG9tZXJfbGF0IjogMzguOTksICJjdXN0b21lcl9sb24iOiAtNzYuOTQsICJtZXJjaGFudF9sYXQiOiAzOS4wLCAibWVyY2hhbnRfbG9uIjogLTc2LjksICJhZ2VfYXRfdHJhbnNhY3Rpb24iOiAzMCwgImhvdXIiOiAxMiwgIndlZWtkYXkiOiAyLCAibW9udGgiOiA3fSwgImdyb3VuZF90cnV0aCI6IHsiaXNfZnJhdWQiOiAwfX0=",
+        "partitionKey": "f9cd960a82c1087546af0c24",
+        "sequenceNumber": "1"
+      }
+    }
+  ]
+}

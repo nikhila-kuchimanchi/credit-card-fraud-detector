@@ -1,0 +1,368 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Credit card fraud classroom demo: EC2 replay producer, Kinesis, S3, isolated public subnet. No inference/backend deployed.",
+  "Parameters": {
+    "AmiId": {
+      "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+      "Default": "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+    },
+    "InstanceType": {
+      "Type": "String",
+      "Default": "t3.micro",
+      "AllowedValues": [
+        "t3.micro",
+        "t3.small"
+      ]
+    },
+    "Rate": {
+      "Type": "Number",
+      "Default": 5,
+      "MinValue": 1,
+      "MaxValue": 100
+    },
+    "DatasetName": {
+      "Type": "String",
+      "Default": "fraudTest",
+      "AllowedPattern": "[a-zA-Z0-9_-]+"
+    },
+    "ExistingInstanceProfileName": {
+      "Type": "String",
+      "Default": "",
+      "Description": "Optional lab-provided INSTANCE PROFILE name, not role ARN. Must permit S3 reads, Kinesis writes and SSM."
+    }
+  },
+  "Conditions": {
+    "CreateRole": {
+      "Fn::Equals": [
+        {
+          "Ref": "ExistingInstanceProfileName"
+        },
+        ""
+      ]
+    }
+  },
+  "Resources": {
+    "Vpc": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.42.0.0/16",
+        "EnableDnsSupport": true,
+        "EnableDnsHostnames": true
+      }
+    },
+    "Gateway": {
+      "Type": "AWS::EC2::InternetGateway"
+    },
+    "GatewayAttachment": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc"
+        },
+        "InternetGatewayId": {
+          "Ref": "Gateway"
+        }
+      }
+    },
+    "Subnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc"
+        },
+        "CidrBlock": "10.42.1.0/24",
+        "MapPublicIpOnLaunch": true,
+        "AvailabilityZone": {
+          "Fn::Select": [
+            0,
+            {
+              "Fn::GetAZs": ""
+            }
+          ]
+        }
+      }
+    },
+    "RouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "Vpc"
+        }
+      }
+    },
+    "Route": {
+      "Type": "AWS::EC2::Route",
+      "DependsOn": "GatewayAttachment",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "RouteTable"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "Gateway"
+        }
+      }
+    },
+    "SubnetRoute": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "Subnet"
+        },
+        "RouteTableId": {
+          "Ref": "RouteTable"
+        }
+      }
+    },
+    "SecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Producer outbound only; manage with Session Manager",
+        "VpcId": {
+          "Ref": "Vpc"
+        },
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "DataBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "BucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "DataBucket"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:*",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "DataBucket",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Sub": "${DataBucket.Arn}/*"
+                }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": "false"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "Stream": {
+      "Type": "AWS::Kinesis::Stream",
+      "Properties": {
+        "RetentionPeriodHours": 24,
+        "ShardCount": 1,
+        "StreamModeDetails": {
+          "StreamMode": "PROVISIONED"
+        }
+      }
+    },
+    "ProducerRole": {
+      "Type": "AWS::IAM::Role",
+      "Condition": "CreateRole",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/AmazonSSMManagedInstanceCore"
+          }
+        ],
+        "Policies": [
+          {
+            "PolicyName": "ProducerOnly",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "kinesis:PutRecords"
+                  ],
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "Stream",
+                      "Arn"
+                    ]
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:GetObject"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "${DataBucket.Arn}/data/*"
+                    },
+                    {
+                      "Fn::Sub": "${DataBucket.Arn}/artifacts/*"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ProducerProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Condition": "CreateRole",
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "ProducerRole"
+          }
+        ]
+      }
+    },
+    "ProducerInstance": {
+      "Type": "AWS::EC2::Instance",
+      "DependsOn": [
+        "Route",
+        "SubnetRoute"
+      ],
+      "Properties": {
+        "ImageId": {
+          "Ref": "AmiId"
+        },
+        "InstanceType": {
+          "Ref": "InstanceType"
+        },
+        "IamInstanceProfile": {
+          "Fn::If": [
+            "CreateRole",
+            {
+              "Ref": "ProducerProfile"
+            },
+            {
+              "Ref": "ExistingInstanceProfileName"
+            }
+          ]
+        },
+        "MetadataOptions": {
+          "HttpTokens": "required",
+          "HttpEndpoint": "enabled"
+        },
+        "NetworkInterfaces": [
+          {
+            "DeviceIndex": "0",
+            "AssociatePublicIpAddress": true,
+            "SubnetId": {
+              "Ref": "Subnet"
+            },
+            "GroupSet": [
+              {
+                "Ref": "SecurityGroup"
+              }
+            ]
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/xvda",
+            "Ebs": {
+              "VolumeSize": 12,
+              "VolumeType": "gp3",
+              "Encrypted": true,
+              "DeleteOnTermination": true
+            }
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Sub": "${AWS::StackName}-producer"
+            }
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Sub": "#!/bin/bash\nset -euxo pipefail\ndnf install -y python3.11 python3.11-pip unzip awscli-2\nsystemctl enable --now amazon-ssm-agent\nmkdir -p /opt/fraud\ncat > /opt/fraud/config.env <<'ENV'\nAWS_DEFAULT_REGION=${AWS::Region}\nAWS_REGION=${AWS::Region}\nDATA_BUCKET=${DataBucket}\nSTREAM_NAME=${Stream}\nRATE=${Rate}\nDATASET_NAME=${DatasetName}\nENV\ncat > /opt/fraud/start.sh <<'SCRIPT'\n#!/bin/bash\nset -euo pipefail\ncd /opt/fraud\n# A failed download/setup exits; systemd retries without hiding the failure.\naws s3 cp \"s3://$DATA_BUCKET/artifacts/producer.zip\" code.zip\nunzip -oq code.zip -d code\nif [ ! -f transactions.csv ]; then\n    aws s3 cp \"s3://$DATA_BUCKET/data/replay.csv\" transactions.csv.part\n    mv transactions.csv.part transactions.csv\nfi\nif [ ! -x venv/bin/python ]; then python3.11 -m venv venv; fi\nvenv/bin/python -m pip install -q -r code/requirements.txt\nexec venv/bin/python code/src/producer.py --csv transactions.csv \\\n    --dataset \"$DATASET_NAME\" --region \"$AWS_DEFAULT_REGION\" \\\n    --stream \"$STREAM_NAME\" --rate \"$RATE\" --batch-size 5 \\\n    --checkpoint /opt/fraud/state/checkpoint.json --loop\nSCRIPT\nchmod 750 /opt/fraud/start.sh\nchown -R ec2-user:ec2-user /opt/fraud\ncat > /etc/systemd/system/fraud-producer.service <<'SERVICE'\n[Unit]\nDescription=Dataset replay to Kinesis\nWants=network-online.target\nAfter=network-online.target\nStartLimitIntervalSec=0\n[Service]\nType=simple\nUser=ec2-user\nWorkingDirectory=/opt/fraud\nEnvironmentFile=/opt/fraud/config.env\nEnvironment=PYTHONUNBUFFERED=1\nExecStart=/opt/fraud/start.sh\nRestart=on-failure\nRestartSec=30\nNoNewPrivileges=true\n[Install]\nWantedBy=multi-user.target\nSERVICE\nsystemctl daemon-reload\nsystemctl enable --now fraud-producer\n"
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "StreamName": {
+      "Value": {
+        "Ref": "Stream"
+      }
+    },
+    "StreamArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "Stream",
+          "Arn"
+        ]
+      }
+    },
+    "DataBucketName": {
+      "Value": {
+        "Ref": "DataBucket"
+      }
+    },
+    "InstanceId": {
+      "Value": {
+        "Ref": "ProducerInstance"
+      }
+    },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
+    "EventSchemaVersion": {
+      "Value": "1.0"
+    }
+  }
+}

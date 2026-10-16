@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fraud-stream:event:1.0",
+  "title": "Fraud replay transaction v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "feature_version",
+    "event_id",
+    "replay_id",
+    "replay_cycle",
+    "source_row",
+    "source_dataset",
+    "source_transaction_id",
+    "source_timestamp",
+    "emitted_at",
+    "account_id",
+    "features",
+    "ground_truth"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "feature_version": {
+      "const": "v1"
+    },
+    "event_id": {
+      "type": "string"
+    },
+    "replay_id": {
+      "type": "string"
+    },
+    "replay_cycle": {
+      "type": "integer"
+    },
+    "source_row": {
+      "type": "integer"
+    },
+    "source_dataset": {
+      "type": "string"
+    },
+    "source_transaction_id": {
+      "type": "string"
+    },
+    "source_timestamp": {
+      "type": "string"
+    },
+    "emitted_at": {
+      "type": "string"
+    },
+    "account_id": {
+      "type": "string"
+    },
+    "features": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amount",
+        "category",
+        "merchant",
+        "state",
+        "city_population",
+        "customer_lat",
+        "customer_lon",
+        "merchant_lat",
+        "merchant_lon",
+        "age_at_transaction",
+        "hour",
+        "weekday",
+        "month"
+      ],
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "category": {
+          "type": "string"
+        },
+        "merchant": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "city_population": {
+          "type": "integer"
+        },
+        "customer_lat": {
+          "type": "number"
+        },
+        "customer_lon": {
+          "type": "number"
+        },
+        "merchant_lat": {
+          "type": "number"
+        },
+        "merchant_lon": {
+          "type": "number"
+        },
+        "age_at_transaction": {
+          "type": "integer"
+        },
+        "hour": {
+          "type": "integer"
+        },
+        "weekday": {
+          "type": "integer"
+        },
+        "month": {
+          "type": "integer"
+        }
+      }
+    },
+    "ground_truth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "is_fraud"
+      ],
+      "properties": {
+        "is_fraud": {
+          "type": "integer",
+          "enum": [
+            0,
+            1
+          ]
+        }
+      }
+    }
+  }
+}

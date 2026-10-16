@@ -1,0 +1,21 @@
+trans_date_trans_time,cc_num,merchant,category,amt,state,city_pop,lat,long,merch_lat,merch_long,dob,trans_num,is_fraud
+2020-07-01 12:00:00,DEMO_ACCOUNT_0,fictional_merchant_0,grocery_pos,8.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0000,0
+2020-07-01 12:00:01,DEMO_ACCOUNT_1,fictional_merchant_1,shopping_net,11.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0001,0
+2020-07-01 12:00:02,DEMO_ACCOUNT_2,fictional_merchant_2,grocery_pos,14.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0002,0
+2020-07-01 12:00:03,DEMO_ACCOUNT_0,fictional_merchant_3,shopping_net,17.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0003,0
+2020-07-01 12:00:04,DEMO_ACCOUNT_1,fictional_merchant_0,grocery_pos,20.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0004,0
+2020-07-01 12:00:05,DEMO_ACCOUNT_2,fictional_merchant_1,shopping_net,23.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0005,0
+2020-07-01 12:00:06,DEMO_ACCOUNT_0,fictional_merchant_2,grocery_pos,26.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0006,0
+2020-07-01 12:00:07,DEMO_ACCOUNT_1,fictional_merchant_3,shopping_net,29.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0007,1
+2020-07-01 12:00:08,DEMO_ACCOUNT_2,fictional_merchant_0,grocery_pos,32.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0008,0
+2020-07-01 12:00:09,DEMO_ACCOUNT_0,fictional_merchant_1,shopping_net,35.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0009,0
+2020-07-01 12:00:10,DEMO_ACCOUNT_1,fictional_merchant_2,grocery_pos,38.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0010,0
+2020-07-01 12:00:11,DEMO_ACCOUNT_2,fictional_merchant_3,shopping_net,41.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0011,0
+2020-07-01 12:00:12,DEMO_ACCOUNT_0,fictional_merchant_0,grocery_pos,44.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0012,0
+2020-07-01 12:00:13,DEMO_ACCOUNT_1,fictional_merchant_1,shopping_net,47.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0013,0
+2020-07-01 12:00:14,DEMO_ACCOUNT_2,fictional_merchant_2,grocery_pos,50.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0014,0
+2020-07-01 12:00:15,DEMO_ACCOUNT_0,fictional_merchant_3,shopping_net,53.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0015,0
+2020-07-01 12:00:16,DEMO_ACCOUNT_1,fictional_merchant_0,grocery_pos,56.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0016,1
+2020-07-01 12:00:17,DEMO_ACCOUNT_2,fictional_merchant_1,shopping_net,59.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0017,0
+2020-07-01 12:00:18,DEMO_ACCOUNT_0,fictional_merchant_2,grocery_pos,62.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0018,0
+2020-07-01 12:00:19,DEMO_ACCOUNT_1,fictional_merchant_3,shopping_net,65.50,MD,30000,38.99,-76.94,39.0,-76.9,1990-01-01,fictional_tx_0019,0

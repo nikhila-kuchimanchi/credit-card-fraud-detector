@@ -1,0 +1,18 @@
+{
+  "fraudTrain.csv": {
+    "rows": 1296675,
+    "fraud_rows": 7506,
+    "fraud_percent": 0.5789,
+    "bytes": 351238196,
+    "start": "2019-01-01 00:00:18",
+    "end": "2020-06-21 12:13:37"
+  },
+  "fraudTest.csv": {
+    "rows": 555719,
+    "fraud_rows": 2145,
+    "fraud_percent": 0.386,
+    "bytes": 150354339,
+    "start": "2020-06-21 12:14:25",
+    "end": "2020-12-31 23:59:34"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "feature_version": "v1",
+  "event_id": "a3836b30-2a39-543c-a8af-baca7121e670",
+  "replay_id": "00000000-0000-0000-0000-000000000001",
+  "replay_cycle": 0,
+  "source_row": 0,
+  "source_dataset": "synthetic_sample",
+  "source_transaction_id": "fictional_tx_0000",
+  "source_timestamp": "2020-07-01 12:00:00",
+  "emitted_at": "2026-10-16T18:00:00+00:00",
+  "account_id": "f9cd960a82c1087546af0c24",
+  "features": {
+    "amount": 8.5,
+    "category": "grocery_pos",
+    "merchant": "fictional_merchant_0",
+    "state": "MD",
+    "city_population": 30000,
+    "customer_lat": 38.99,
+    "customer_lon": -76.94,
+    "merchant_lat": 39.0,
+    "merchant_lon": -76.9,
+    "age_at_transaction": 30,
+    "hour": 12,
+    "weekday": 2,
+    "month": 7
+  },
+  "ground_truth": {
+    "is_fraud": 0
+  }
+}

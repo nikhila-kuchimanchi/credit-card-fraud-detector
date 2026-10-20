@@ -79,3 +79,11 @@ Read API usage: `repo.list_recent(ddb, day="2026-10-20", limit=50)` and
 - [ ] Agree threshold and endpoint response format with model owner.
 - [ ] Alerting is at-least-once: if SNS publish succeeds but `mark_alert_sent` fails,
       a retry can send one duplicate email (acceptable for the demo).
+
+## Try it with the fake 20-row CSV
+
+```bash
+python -m db.load_sample --region us-east-1           # 20 items: 18 scored (3 flagged), 1 ERROR, 1 PENDING
+python -m db.load_sample --region us-east-1 --delete  # clean up
+```
+Scores are random placeholders (`model_version = demo-fake-v0`), not model output.

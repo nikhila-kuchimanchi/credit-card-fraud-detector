@@ -5,8 +5,8 @@
             "Sid": "WriteFraudTransactions",
             "Effect": "Allow",
             "Action": [
-                "dynamodb: PutItem",
-                "dynamodb: UpdateItem"
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem"
             ],
             "Resource": "arn:aws:dynamodb:us-east-1:658980432945:table/FraudTransactions"
         }

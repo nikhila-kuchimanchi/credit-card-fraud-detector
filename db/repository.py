@@ -171,6 +171,30 @@ def record_error(client, event_id, message, table=schema.TABLE_NAME, now=None):
         raise
 
 
+def begin_alert(client, event_id, table=schema.TABLE_NAME, now=None):
+    """Return True if this item still needs an alert (alert_status is PENDING).
+
+    Uses a conditional UpdateItem instead of a read, so the writer Lambda needs no
+    GetItem permission. Called on every delivery of a flagged item, so an alert
+    whose first attempt failed is retried. Delivery is at-least-once: a crash
+    between SNS publish and mark_alert_sent can send one duplicate email.
+    """
+    try:
+        client.update_item(
+            TableName=table,
+            Key={"event_id": to_attr(event_id)},
+            UpdateExpression="SET alert_attempted_at = :ts ADD alert_attempts :one",
+            ConditionExpression="alert_status = :pending",
+            ExpressionAttributeValues=_values(ts=_now_iso(now), one=1,
+                                              pending=schema.ALERT_PENDING),
+        )
+        return True
+    except Exception as exc:
+        if _is_conditional_failure(exc):
+            return False
+        raise
+
+
 def mark_alert_sent(client, event_id, message_id, table=schema.TABLE_NAME, now=None):
     """PENDING -> SENT once. Returns False if already sent."""
     try:
